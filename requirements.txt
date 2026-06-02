@@ -7,7 +7,7 @@ psycopg[binary]==3.1.18
 dj-database-url==2.1.0
 cloudinary==1.36.0
 django-cloudinary-storage==0.3.0
-pillow==10.1.0
+pillow>=11.0.0
 python-decouple==3.8
 django-axes==6.1.1
 django-ratelimit==4.1.0

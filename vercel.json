@@ -1,20 +1,18 @@
 {
-  "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput --clear",
-  "devCommand": "python manage.py runserver 0.0.0.0:3000",
-  "env": {
-    "PYTHONUNBUFFERED": "1",
-    "DJANGO_SETTINGS_MODULE": "academic_portfolio.settings"
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/api/handler.py"
+    "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput --clear",
+    "devCommand": "python manage.py runserver 0.0.0.0:3000",
+    "env": {
+        "PYTHONUNBUFFERED": "1",
+        "DJANGO_SETTINGS_MODULE": "academic_portfolio.settings"
+    },
+    "rewrites": [{
+        "source": "/(.*)",
+        "destination": "/api/handler.py"
+    }],
+    "functions": {
+        "api/handler.py": {
+            "memory": 1024,
+            "maxDuration": 60
+        }
     }
-  ],
-  "functions": {
-    "api/handler.py": {
-      "memory": 1024,
-      "maxDuration": 60
-    }
-  }
 }
