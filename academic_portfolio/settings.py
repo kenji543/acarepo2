@@ -25,13 +25,10 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-dev-key-change-in-produc
 DEBUG = env('DEBUG', default=False)
 
 # Allow all Vercel domains and include specific domain if provided
-ALLOWED_HOSTS_DEFAULT = 'localhost,127.0.0.1,.vercel.app'
-VERCEL_PROJECT_NAME = env('VERCEL_PROJECT_NAME', default='')
-if VERCEL_PROJECT_NAME:
-    ALLOWED_HOSTS_DEFAULT = f'{ALLOWED_HOSTS_DEFAULT},{VERCEL_PROJECT_NAME}.vercel.app'
-
-ALLOWED_HOSTS = env('ALLOWED_HOSTS', default=ALLOWED_HOSTS_DEFAULT).split(',')
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.up.railway.app']
+if 'RAILWAY_PUBLIC_DOMAIN' in os.environ:
+    ALLOWED_HOSTS.append(os.environ['RAILWAY_PUBLIC_DOMAIN'])
+    
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
