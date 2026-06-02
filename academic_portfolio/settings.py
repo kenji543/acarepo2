@@ -24,7 +24,7 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-dev-key-change-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG', default=False)
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -173,6 +173,25 @@ SIMPLE_JWT = {
 # ===== CORS CONFIGURATION =====
 CORS_ALLOWED_ORIGINS = env('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000').split(',')
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # ===== DJANGO-AXES CONFIGURATION (Brute-force protection) =====
 AXES_FAILURE_LIMIT = 5  # Lock after 5 failed attempts

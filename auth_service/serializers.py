@@ -47,10 +47,16 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         
-        # Add custom claims
-        profile = user.researcher_profile
-        token['tier'] = profile.tier
-        token['institution'] = profile.institution
+        # Add custom claims with safe profile access
+        try:
+            profile = user.researcher_profile
+            token['tier'] = profile.tier
+            token['institution'] = profile.institution
+        except Exception:
+            # Profile doesn't exist yet, use defaults
+            token['tier'] = 'private'
+            token['institution'] = ''
+        
         token['username'] = user.username
         
         return token

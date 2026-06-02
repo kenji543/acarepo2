@@ -33,7 +33,7 @@ class RegisterView(viewsets.ViewSet):
             ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
             AuditLog.objects.create(
                 user=user,
-                event_type='login',
+                event_type='registration',
                 description=f'New user registration: {user.username}',
                 ip_address=ip,
                 user_agent=request.META.get('HTTP_USER_AGENT', '')
@@ -41,6 +41,10 @@ class RegisterView(viewsets.ViewSet):
             
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def options(self, request, *args, **kwargs):
+        """Handle CORS preflight OPTIONS requests."""
+        return Response(status=status.HTTP_200_OK)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
