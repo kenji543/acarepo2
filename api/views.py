@@ -2,7 +2,8 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from django_filters import rest_framework as filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -38,9 +39,11 @@ class ResearcherProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ResearcherProfileSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [filters.DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['tier', 'institution']
     search_fields = ['user__username', 'institution', 'orcid_id']
+    ordering_fields = ['user__username', 'created_at']
+    ordering = ['-created_at']
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -67,7 +70,7 @@ class ResearchPaperViewSet(viewsets.ModelViewSet):
     serializer_class = ResearchPaperSerializer
     permission_classes = [IsOwnerOrReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [filters.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['status', 'visibility', 'researcher']
     search_fields = ['title', 'abstract', 'keywords', 'doi']
     ordering_fields = ['publication_date', 'created_at', 'view_count']
@@ -185,7 +188,7 @@ class DatasetViewSet(viewsets.ModelViewSet):
     serializer_class = DatasetSerializer
     permission_classes = [IsOwnerOrReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [filters.DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['status', 'visibility', 'file_format', 'researcher']
     search_fields = ['title', 'description']
     
