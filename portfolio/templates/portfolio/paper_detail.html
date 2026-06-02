@@ -58,13 +58,9 @@
       </div>
 
       {% if paper.keywords %}
-      <div>
-        <h2 class="text-lg font-semibold text-slate-900">Keywords</h2>
-        <div class="mt-3 flex flex-wrap gap-2">
-          {% for keyword in paper.keywords.split:"," %}
-          <span class="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">{{ keyword }}</span>
-          {% endfor %}
-        </div>
+      <div class="flex flex-wrap items-center gap-2 pt-2">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Keywords:</span>
+        <span class="text-sm text-slate-700">{{ paper.keywords }}</span>
       </div>
       {% endif %}
 
