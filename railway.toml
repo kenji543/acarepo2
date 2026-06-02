@@ -1,14 +1,14 @@
 # Railway deployment configuration
-name = academic-portfolio-repo
-description = Secure Academic Research & Portfolio Repository
+name = "academic-portfolio-repo"
+description = "Secure Academic Research & Portfolio Repository"
 
 # Build configuration
-builder = dockerfile
+builder = "dockerfile"
 
 # Environment setup
-runtime = python-3.11
+runtime = "python-3.11"
 
 # Deployment variables
-env:
-  DJANGO_SETTINGS_MODULE: academic_portfolio.settings
-  PYTHONUNBUFFERED: 1
+[env]
+DJANGO_SETTINGS_MODULE = "academic_portfolio.settings"
+PYTHONUNBUFFERED = "1"
