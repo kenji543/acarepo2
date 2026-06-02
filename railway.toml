@@ -1,9 +1,0 @@
-[project]
-name = "academic-portfolio-repo"
-
-[build]
-builder = "dockerfile"
-
-[env]
-DJANGO_SETTINGS_MODULE = "academic_portfolio.settings"
-PYTHONUNBUFFERED = "1"
