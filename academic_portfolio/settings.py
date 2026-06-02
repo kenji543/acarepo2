@@ -24,7 +24,13 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-dev-key-change-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG', default=False)
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app').split(',')
+# Allow all Vercel domains and include specific domain if provided
+ALLOWED_HOSTS_DEFAULT = 'localhost,127.0.0.1,.vercel.app'
+VERCEL_PROJECT_NAME = env('VERCEL_PROJECT_NAME', default='')
+if VERCEL_PROJECT_NAME:
+    ALLOWED_HOSTS_DEFAULT = f'{ALLOWED_HOSTS_DEFAULT},{VERCEL_PROJECT_NAME}.vercel.app'
+
+ALLOWED_HOSTS = env('ALLOWED_HOSTS', default=ALLOWED_HOSTS_DEFAULT).split(',')
 
 # Application definition
 INSTALLED_APPS = [
