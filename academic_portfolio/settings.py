@@ -312,3 +312,4 @@ LOGGING = {
 # Create logs directory if it doesn't exist
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 SILENCED_SYSTEM_CHECKS = ['django_ratelimit.W001']
+SILENCED_SYSTEM_CHECKS = ['django_ratelimit.E003']
