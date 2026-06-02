@@ -3,73 +3,79 @@
 {% block title %}Upload Research Paper{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8">
-            <h1>Upload Research Paper</h1>
-            
-            <form method="post" enctype="multipart/form-data" class="mt-4">
-                {% csrf_token %}
-                
-                <div class="form-group">
-                    {{ form.title }}
-                    {% if form.title.errors %}
-                    <div class="alert alert-danger">{{ form.title.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    {{ form.abstract }}
-                    {% if form.abstract.errors %}
-                    <div class="alert alert-danger">{{ form.abstract.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{ form.keywords }}
-                    </div>
-                    <div class="form-group col-md-6">
-                        {{ form.doi }}
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{ form.publication_date }}
-                    </div>
-                    <div class="form-group col-md-6">
-                        {{ form.status }}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.pdf_file.id_for_label }}">PDF File (Required)</label>
-                    {{ form.pdf_file }}
-                    <small class="form-text text-muted">Maximum file size: 100 MB</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.supplementary_data.id_for_label }}">Supplementary Data (Optional)</label>
-                    {{ form.supplementary_data }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.raw_data_file.id_for_label }}">Raw Data File (Optional)</label>
-                    {{ form.raw_data_file }}
-                    <small class="form-text text-muted">Restricted access - only accessible to authorized reviewers</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.visibility.id_for_label }}">Visibility</label>
-                    {{ form.visibility }}
-                </div>
-
-                <button type="submit" class="btn btn-primary btn-lg">Upload Paper</button>
-                <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-lg">Cancel</a>
-            </form>
+<div class="mx-auto max-w-4xl rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm shadow-slate-200/50">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <p class="text-sm uppercase tracking-[0.3em] text-slate-500">Contributor Workflow</p>
+            <h1 class="text-3xl font-semibold text-slate-900">Upload Research Paper</h1>
         </div>
+        <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+            <i data-lucide="chevron-left"></i> Back to Dashboard
+        </a>
     </div>
-</div>
 
+    <form method="post" enctype="multipart/form-data" class="mt-8 space-y-6">
+        {% csrf_token %}
+
+        <div class="grid gap-6">
+            <div class="space-y-2">
+                {{ form.title.label_tag }}
+                {{ form.title }}
+                {% if form.title.errors %}
+                <p class="text-sm text-red-600">{{ form.title.errors }}</p>
+                {% endif %}
+            </div>
+            <div class="space-y-2">
+                {{ form.abstract.label_tag }}
+                {{ form.abstract }}
+                {% if form.abstract.errors %}
+                <p class="text-sm text-red-600">{{ form.abstract.errors }}</p>
+                {% endif %}
+            </div>
+            <div class="grid gap-6 sm:grid-cols-2">
+                <div class="space-y-2">
+                    {{ form.keywords.label_tag }}
+                    {{ form.keywords }}
+                </div>
+                <div class="space-y-2">
+                    {{ form.doi.label_tag }}
+                    {{ form.doi }}
+                </div>
+            </div>
+            <div class="grid gap-6 sm:grid-cols-2">
+                <div class="space-y-2">
+                    {{ form.publication_date.label_tag }}
+                    {{ form.publication_date }}
+                </div>
+                <div class="space-y-2">
+                    {{ form.status.label_tag }}
+                    {{ form.status }}
+                </div>
+            </div>
+            <div class="space-y-2">
+                {{ form.pdf_file.label_tag }}
+                {{ form.pdf_file }}
+                <p class="text-sm text-slate-500">Maximum file size: 100 MB</p>
+            </div>
+            <div class="space-y-2">
+                {{ form.supplementary_data.label_tag }}
+                {{ form.supplementary_data }}
+            </div>
+            <div class="space-y-2">
+                {{ form.raw_data_file.label_tag }}
+                {{ form.raw_data_file }}
+                <p class="text-sm text-slate-500">Restricted access — only authorized reviewers can access raw data.</p>
+            </div>
+            <div class="space-y-2">
+                {{ form.visibility.label_tag }}
+                {{ form.visibility }}
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <a href="{% url 'dashboard' %}" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</a>
+            <button type="submit" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800">Upload Paper</button>
+        </div>
+    </form>
+</div>
 {% endblock %}

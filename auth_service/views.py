@@ -88,7 +88,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 class LogoutView(viewsets.ViewSet):
     """API endpoint for logout with token blacklisting."""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     
     def create(self, request):
         serializer = LogoutSerializer(data=request.data)
@@ -98,21 +98,30 @@ class LogoutView(viewsets.ViewSet):
                 refresh_token = serializer.validated_data['refresh']
                 token = RefreshToken(refresh_token)
                 
-                # Blacklist the token
-                from rest_framework_simplejwt.tokens import Token
-                blacklist_token = TokenBlacklist(
-                    user=request.user,
-                    token=str(token),
-                    expires_at=timezone.now() + timezone.timedelta(days=7)
-                )
-                blacklist_token.save()
+                logout_user = None
+                if request.user.is_authenticated:
+                    logout_user = request.user
+                else:
+                    user_id = token.payload.get('user_id') if hasattr(token, 'payload') else token.get('user_id', None)
+                    if user_id:
+                        try:
+                            logout_user = User.objects.get(pk=user_id)
+                        except User.DoesNotExist:
+                            logout_user = None
                 
-                # Log logout
+                if logout_user:
+                    blacklist_token = TokenBlacklist(
+                        user=logout_user,
+                        token=str(token),
+                        expires_at=timezone.now() + timezone.timedelta(days=7)
+                    )
+                    blacklist_token.save()
+                
                 ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
                 AuditLog.objects.create(
-                    user=request.user,
+                    user=logout_user,
                     event_type='logout',
-                    description=f'User logged out',
+                    description='User logged out',
                     ip_address=ip,
                     user_agent=request.META.get('HTTP_USER_AGENT', '')
                 )

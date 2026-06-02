@@ -3,96 +3,106 @@
 {% block title %}Academic Portfolios{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>Academic Research Portfolios</h1>
-    
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Search & Filter</h5>
-                    <form method="get" class="form">
-                        <div class="form-group">
-                            <input type="text" name="q" class="form-control" placeholder="Search papers..." value="{{ request.GET.q }}">
-                        </div>
-                        <div class="form-group">
-                            <select name="institution" class="form-control">
-                                <option value="">All Institutions</option>
-                                <option value="MIT" {% if request.GET.institution == "MIT" %}selected{% endif %}>MIT</option>
-                                <option value="Harvard" {% if request.GET.institution == "Harvard" %}selected{% endif %}>Harvard</option>
-                                <option value="Stanford" {% if request.GET.institution == "Stanford" %}selected{% endif %}>Stanford</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">Search</button>
-                    </form>
-                </div>
+<div class="mx-auto max-w-7xl space-y-8">
+    <section class="rounded-[2rem] border border-slate-200 bg-white/90 p-6 shadow-sm shadow-slate-200/50 backdrop-blur-xl">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Research Library</p>
+                <h1 class="mt-3 text-3xl font-semibold tracking-tight text-slate-900">Explore peer-reviewed research portfolios</h1>
+                <p class="mt-2 max-w-2xl text-sm leading-7 text-slate-600">Find academic papers with deep abstracts, author metadata, and easy access to downloads.</p>
+            </div>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-slate-900/10 hover:bg-slate-800">
+                    <i data-lucide="grid"></i> My Dashboard
+                </a>
+                <a href="{% url 'create_paper' %}" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 hover:border-slate-300 hover:bg-slate-50">
+                    <i data-lucide="upload"></i> Upload Paper
+                </a>
             </div>
         </div>
+    </section>
 
-        <div class="col-md-8">
-            <div class="row">
+    <section class="grid gap-6 lg:grid-cols-[320px_1fr]">
+        <div class="space-y-6 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/50">
+            <h2 class="text-xl font-semibold text-slate-900">Live Search</h2>
+            <p class="text-sm leading-6 text-slate-600">Filter papers instantly without reloading the page.</p>
+            <form method="get" hx-get="." hx-target="#paper-results" hx-swap="innerHTML" hx-trigger="keyup changed delay:300ms, search" hx-push-url="true" class="space-y-4">
+                <div class="space-y-2">
+                    <label for="q" class="text-sm font-medium text-slate-700">Search papers</label>
+                    <input id="q" name="q" type="search" value="{{ request.GET.q }}" placeholder="Search by title, author or topic" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200" />
+                </div>
+                <div class="space-y-2">
+                    <label for="institution" class="text-sm font-medium text-slate-700">Filter by institution</label>
+                    <select id="institution" name="institution" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200">
+                        <option value="">All Institutions</option>
+                        <option value="MIT" {% if request.GET.institution == "MIT" %}selected{% endif %}>MIT</option>
+                        <option value="Harvard" {% if request.GET.institution == "Harvard" %}selected{% endif %}>Harvard</option>
+                        <option value="Stanford" {% if request.GET.institution == "Stanford" %}selected{% endif %}>Stanford</option>
+                    </select>
+                </div>
+                <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
+                    <i data-lucide="search"></i> Search
+                </button>
+            </form>
+        </div>
+
+        <div class="space-y-5" id="paper-results">
+            {% if papers %}
+            <div class="grid gap-5 md:grid-cols-2">
                 {% for paper in papers %}
-                <div class="col-md-12 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{% url 'paper_detail' paper.id %}">{{ paper.title }}</a>
-                            </h5>
-                            <p class="card-text">{{ paper.abstract|truncatewords:50 }}</p>
-                            <p class="text-muted">
-                                <strong>By:</strong> {{ paper.researcher.user.get_full_name }}
-                                {% for co_author in paper.co_authors.all|slice:":3" %}
-                                , {{ co_author.author_name }}
-                                {% endfor %}
-                            </p>
-                            <p class="text-muted">
-                                <strong>Institution:</strong> {{ paper.researcher.institution }}
-                            </p>
-                            <p>
-                                {% if paper.doi %}
-                                <a href="https://doi.org/{{ paper.doi }}" target="_blank">DOI: {{ paper.doi }}</a>
-                                {% endif %}
-                            </p>
-                            <div>
-                                <a href="{% url 'paper_detail' paper.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
-                                {% if user.is_authenticated %}
-                                <a href="{% url 'download_paper' paper.id %}" class="btn btn-sm btn-primary">Download</a>
-                                {% endif %}
-                            </div>
+                <article class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/50 transition duration-200 hover:-translate-y-1 hover:shadow-md">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.3em] text-slate-400">{{ paper.researcher.institution }}</p>
+                            <h2 class="mt-3 text-xl font-semibold text-slate-900 leading-snug"><a href="{% url 'paper_detail' paper.id %}" class="hover:text-slate-700">{{ paper.title }}</a></h2>
                         </div>
+                        <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">{{ paper.get_visibility_display }}</span>
                     </div>
-                </div>
-                {% empty %}
-                <div class="col-md-12">
-                    <p class="alert alert-info">No papers found matching your criteria.</p>
-                </div>
+                    <p class="mt-4 text-sm leading-7 text-slate-600">{{ paper.abstract|truncatewords:45 }}</p>
+                    <div class="mt-5 flex flex-wrap gap-2">
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">By {{ paper.researcher.user.get_full_name }}</span>
+                        {% for co_author in paper.co_authors.all|slice:":2" %}
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">{{ co_author.author_name }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-6 flex flex-wrap items-center gap-3">
+                        <a href="{% url 'paper_detail' paper.id %}" class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-50">
+                            <i data-lucide="book"></i> View Details
+                        </a>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'download_paper' paper.id %}" class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">
+                            <i data-lucide="download"></i> Download
+                        </a>
+                        {% endif %}
+                    </div>
+                </article>
                 {% endfor %}
             </div>
+            {% else %}
+            <div class="rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-sm shadow-slate-200/50">
+                <p class="text-lg font-semibold text-slate-900">No papers found</p>
+                <p class="mt-3 text-sm leading-6 text-slate-600">Try a different keyword or institution filter to refine your search.</p>
+            </div>
+            {% endif %}
 
-            <!-- Pagination -->
             {% if is_paginated %}
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
+            <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/50">
+                <nav class="flex flex-wrap items-center justify-center gap-2">
                     {% if page_obj.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?page=1">First</a></li>
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                    <a hx-get="?page=1" hx-target="#paper-results" hx-swap="innerHTML" href="?page=1" class="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">First</a>
+                    <a hx-get="?page={{ page_obj.previous_page_number }}" hx-target="#paper-results" hx-swap="innerHTML" href="?page={{ page_obj.previous_page_number }}" class="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Previous</a>
                     {% endif %}
-
                     {% for num in page_obj.paginator.page_range %}
-                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                    </li>
+                    <a hx-get="?page={{ num }}" hx-target="#paper-results" hx-swap="innerHTML" href="?page={{ num }}" class="rounded-full px-4 py-2 text-sm {% if page_obj.number == num %}bg-slate-900 text-white{% else %}border border-slate-200 bg-white text-slate-700 hover:bg-slate-50{% endif %}">{{ num }}</a>
                     {% endfor %}
-
                     {% if page_obj.has_next %}
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a></li>
+                    <a hx-get="?page={{ page_obj.next_page_number }}" hx-target="#paper-results" hx-swap="innerHTML" href="?page={{ page_obj.next_page_number }}" class="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Next</a>
+                    <a hx-get="?page={{ page_obj.paginator.num_pages }}" hx-target="#paper-results" hx-swap="innerHTML" href="?page={{ page_obj.paginator.num_pages }}" class="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Last</a>
                     {% endif %}
-                </ul>
-            </nav>
+                </nav>
+            </div>
             {% endif %}
         </div>
-    </div>
+    </section>
 </div>
-
 {% endblock %}
