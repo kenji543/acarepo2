@@ -28,7 +28,7 @@ DEBUG = env('DEBUG', default=False)
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.up.railway.app']
 if 'RAILWAY_PUBLIC_DOMAIN' in os.environ:
     ALLOWED_HOSTS.append(os.environ['RAILWAY_PUBLIC_DOMAIN'])
-    
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -244,6 +244,7 @@ X_FRAME_OPTIONS = 'DENY'
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # ===== LOGGING CONFIGURATION =====
 LOGGING = {
