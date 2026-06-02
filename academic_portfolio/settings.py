@@ -99,15 +99,17 @@ if os.environ.get('DATABASE_URL'):
         'default': dj_database_url.config(
             conn_max_age=600,
             conn_health_checks=True,
-            atomic=True,
         )
     }
+    # Enable atomic transactions for production database
+    DATABASES['default']['ATOMIC_REQUESTS'] = True
 else:
     # Development: Fallback to SQLite locally
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
+            'ATOMIC_REQUESTS': True,
         }
     }
 
