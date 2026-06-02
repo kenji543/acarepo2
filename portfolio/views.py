@@ -163,7 +163,7 @@ def create_paper(request):
             paper = form.save(commit=False)
             paper.researcher = researcher
             paper.save()
-            return redirect('paper_detail', paper_id=paper.id)
+            return redirect('paper_detail', pk=paper.id)
     else:
         form = ResearchPaperForm()
     
