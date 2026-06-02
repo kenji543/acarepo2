@@ -21,4 +21,4 @@ else:
 END
 
 echo "Starting gunicorn..."
-exec gunicorn academic_portfolio.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 120 --access-logfile -
+exec gunicorn academic_portfolio.wsgi:application --bind 0.0.0.0:8000

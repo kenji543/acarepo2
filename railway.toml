@@ -1,2 +1,2 @@
 [deploy]
-startCommand = "python manage.py migrate && gunicorn academic_portfolio.wsgi:application --bind 0.0.0.0:8000"
+# railway.toml no longer overrides Docker startup. entrypoint.sh runs migrations and starts Gunicorn.
