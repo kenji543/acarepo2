@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import FileResponse, JsonResponse
@@ -145,6 +147,15 @@ def download_paper(request, paper_id):
 @login_required
 def create_paper(request):
     """Create new research paper."""
+    if not getattr(settings, "CLOUDINARY_CONFIGURED", False):
+        messages.error(
+            request,
+            "File uploads are unavailable: Cloudinary credentials are not configured. "
+            "Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET "
+            "in your deployment environment.",
+        )
+        return redirect("dashboard")
+
     if request.method == 'POST':
         form = ResearchPaperForm(request.POST, request.FILES)
         if form.is_valid():

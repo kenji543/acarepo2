@@ -49,7 +49,7 @@
                 <section>
                     <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Attachments</h2>
                     <div class="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
-                        {% include "portfolio/includes/file_upload_zone.html" with field=form.pdf_file icon="file-text" title="Drop your PDF here" hint="PDF format · max 100 MB" filename_id="pdf-filename" full_width=True %}
+                        {% include "portfolio/includes/file_upload_zone.html" with field=form.pdf_file icon="file-text" title="Drop your PDF here" hint="PDF format · max 100 MB" filename_id="pdf-filename" accept="application/pdf" full_width=True %}
                         {% include "portfolio/includes/file_upload_zone.html" with field=form.supplementary_data icon="paperclip" title="Supplementary materials" hint="Figures, appendices, or supporting files" filename_id="supplementary-filename" %}
                         {% include "portfolio/includes/file_upload_zone.html" with field=form.raw_data_file icon="database" title="Raw data" hint="Restricted — authorized reviewers only" filename_id="rawdata-filename" %}
                     </div>

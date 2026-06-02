@@ -10,7 +10,7 @@
                 <i data-lucide="{{ icon|default:'upload-cloud' }}" class="h-6 w-6"></i>
             </span>
             <p class="mt-4 text-sm font-semibold text-slate-800">{{ title|default:field.label }}</p>
-            <p class="mt-1 text-xs text-slate-500">{{ hint }}</p>
+            <p class="mt-1 text-xs text-slate-500">{{ hint }}{% if accept %} · PDF only{% endif %}</p>
             <span class="mt-4 inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm">
                 Browse files
             </span>

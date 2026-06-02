@@ -5,15 +5,26 @@ Django settings for academic_portfolio project.
 import os
 from pathlib import Path
 from datetime import timedelta
-import environ
-import dj_database_url
 
-# Initialize environment variables
+import dj_database_url
+import environ
+
+from .cloudinary_settings import (
+    build_django_cloudinary_storage,
+    configure_cloudinary,
+    is_cloudinary_configured,
+)
+
+# Initialize environment variables (non-Cloudinary settings)
 env = environ.Env(
     DEBUG=(bool, False),
     SECURE_SSL_REDIRECT=(bool, True),
 )
-environ.Env.read_env()
+
+# Load local .env for development; never override variables already set by the host
+_env_file = Path(__file__).resolve().parent.parent / ".env"
+if _env_file.exists():
+    environ.Env.read_env(_env_file, overwrite=False)
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -137,14 +148,20 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ===== CLOUDINARY CONFIGURATION =====
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME', default=''),
-    'API_KEY': env('CLOUDINARY_API_KEY', default=''),
-    'API_SECRET': env('CLOUDINARY_API_SECRET', default=''),
-}
+# Credentials are read only from the process environment (see cloudinary_settings.py).
+CLOUDINARY_CLOUD_NAME = os.environ.get("CLOUDINARY_CLOUD_NAME", "").strip()
+CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY", "").strip()
+CLOUDINARY_API_SECRET = os.environ.get("CLOUDINARY_API_SECRET", "").strip()
+CLOUDINARY_CONFIGURED = is_cloudinary_configured()
 
-# Default file storage
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+if CLOUDINARY_CONFIGURED:
+    configure_cloudinary()
+    CLOUDINARY_STORAGE = build_django_cloudinary_storage()
+    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+else:
+    CLOUDINARY_STORAGE = {}
+    # Allow collectstatic / migrations without Cloudinary; uploads require host env vars.
+    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
 # ===== DJANGO REST FRAMEWORK CONFIGURATION =====
 REST_FRAMEWORK = {

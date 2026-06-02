@@ -14,6 +14,38 @@ FILE_INPUT_CLASS = "absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0
 class ResearchPaperForm(forms.ModelForm):
     """Form for creating/editing research papers."""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        pdf_field = self.fields["pdf_file"]
+        pdf_field.required = True
+        pdf_field.widget.attrs.update(
+            {
+                "accept": "application/pdf",
+                "required": "required",
+            }
+        )
+
+    def clean_pdf_file(self):
+        uploaded = self.cleaned_data.get("pdf_file")
+        if not uploaded:
+            raise forms.ValidationError("A PDF file is required.")
+
+        if not uploaded.name.lower().endswith(".pdf"):
+            raise forms.ValidationError(
+                "Only PDF files are allowed for the main paper upload."
+            )
+
+        content_type = getattr(uploaded, "content_type", "") or ""
+        if content_type and content_type not in (
+            "application/pdf",
+            "application/x-pdf",
+        ):
+            raise forms.ValidationError(
+                "Only PDF files are allowed for the main paper upload."
+            )
+
+        return uploaded
+
     class Meta:
         model = ResearchPaper
         fields = [
@@ -62,7 +94,8 @@ class ResearchPaperForm(forms.ModelForm):
             "pdf_file": forms.FileInput(
                 attrs={
                     "class": FILE_INPUT_CLASS,
-                    "accept": ".pdf,application/pdf",
+                    "accept": "application/pdf",
+                    "required": "required",
                     "data-file-label": "pdf-filename",
                 }
             ),
