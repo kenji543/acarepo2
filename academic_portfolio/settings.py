@@ -176,6 +176,12 @@ SIMPLE_JWT = {
     'USER_ID_CLAIM': 'user_id',
 }
 
+# ===== AUTHENTICATION BACKENDS =====
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',  # django-axes 5.0+ authentication
+    'django.contrib.auth.backends.ModelBackend',  # Default Django auth backend
+]
+
 # ===== CORS CONFIGURATION =====
 CORS_ALLOWED_ORIGINS = env('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000').split(',')
 CORS_ALLOW_CREDENTIALS = True
@@ -199,11 +205,16 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
+# ===== SYSTEM CHECKS CONFIGURATION =====
+# Silence django_ratelimit cache warning - using default LocMemCache for now
+# Production: Use Redis or DatabaseCache for distributed deployments
+SILENCED_SYSTEM_CHECKS = ['django_ratelimit.E003']
+
 # ===== DJANGO-AXES CONFIGURATION (Brute-force protection) =====
 AXES_FAILURE_LIMIT = 5  # Lock after 5 failed attempts
 AXES_COOLOFF_DURATION = timedelta(minutes=15)  # Lock duration
 AXES_LOCK_OUT_AT_FAILURE = True
-AXES_USE_USER_AGENT = True
+# AXES_USE_USER_AGENT = True  # DEPRECATED in django-axes 5.0+ - REMOVED
 AXES_LOCKOUT_TEMPLATE = 'security/lockout.html'
 AXES_VERBOSE = True
 
