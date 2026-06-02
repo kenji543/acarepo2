@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}{{ paper.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <article>
+                <header>
+                    <h1>{{ paper.title }}</h1>
+                    <div class="metadata">
+                        <p class="text-muted">By {{ paper.researcher.user.get_full_name }}</p>
+                        <p class="text-muted">{{ paper.institution }} | Published: {{ paper.publication_date|date:"M d, Y" }}</p>
+                    </div>
+                </header>
+
+                <section class="abstract mt-4">
+                    <h2>Abstract</h2>
+                    <p>{{ paper.abstract }}</p>
+                </section>
+
+                {% if paper.keywords %}
+                <section class="keywords mt-4">
+                    <h3>Keywords</h3>
+                    <p>
+                        {% for keyword in paper.keywords.split:"," %}
+                        <span class="badge badge-light">{{ keyword.strip }}</span>
+                        {% endfor %}
+                    </p>
+                </section>
+                {% endif %}
+
+                {% if paper.doi %}
+                <section class="citation mt-4">
+                    <h3>Citation Information</h3>
+                    <p><strong>DOI:</strong> <a href="https://doi.org/{{ paper.doi }}" target="_blank">{{ paper.doi }}</a></p>
+                </section>
+                {% endif %}
+
+                <section class="authors mt-4">
+                    <h3>Authors</h3>
+                    <ul>
+                        <li>{{ paper.researcher.user.get_full_name }} ({{ paper.researcher.institution }})</li>
+                        {% for co_author in paper.co_authors.all %}
+                        <li>{{ co_author.author_name }} ({{ co_author.author_institution }})</li>
+                        {% endfor %}
+                    </ul>
+                </section>
+
+                <section class="actions mt-4">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'download_paper' paper.id %}" class="btn btn-primary">Download PDF</a>
+                    {% else %}
+                    <p class="alert alert-info"><a href="{% url 'login' %}">Login</a> to download this paper</p>
+                    {% endif %}
+                </section>
+
+                <section class="statistics mt-4">
+                    <p class="text-muted">
+                        <strong>Views:</strong> {{ paper.view_count }} | 
+                        <strong>Downloads:</strong> {{ paper.download_count }}
+                    </p>
+                </section>
+            </article>
+        </div>
+
+        <aside class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>About the Researcher</h5>
+                </div>
+                <div class="card-body">
+                    <h6>{{ paper.researcher.user.get_full_name }}</h6>
+                    <p class="text-muted">{{ paper.researcher.institution }}</p>
+                    <p>{{ paper.researcher.bio }}</p>
+                    {% if paper.researcher.orcid_id %}
+                    <p><a href="https://orcid.org/{{ paper.researcher.orcid_id }}" target="_blank">ORCID: {{ paper.researcher.orcid_id }}</a></p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Paper Details</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Status:</strong> <span class="badge badge-info">{{ paper.get_status_display }}</span></p>
+                    <p><strong>Visibility:</strong> <span class="badge badge-secondary">{{ paper.get_visibility_display }}</span></p>
+                    <p><strong>Published:</strong> {{ paper.publication_date|date:"M d, Y" }}</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+{% endblock %}

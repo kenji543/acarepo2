@@ -1,0 +1,328 @@
+{
+    "info": {
+        "name": "Academic Research & Portfolio Repository API",
+        "description": "Comprehensive API for managing academic research portfolios with tiered access control",
+        "version": "1.0.0",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [{
+            "name": "Authentication",
+            "item": [{
+                    "name": "User Registration",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "url": { "raw": "{{base_url}}/auth/register/", "host": ["{{base_url}}"], "path": ["auth", "register", ""] },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"researcher@example.com\",\n  \"email\": \"researcher@example.com\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"password\": \"SecurePassword123!\",\n  \"password2\": \"SecurePassword123!\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "url": { "raw": "{{base_url}}/auth/login/", "host": ["{{base_url}}"], "path": ["auth", "login", ""] },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"researcher@example.com\",\n  \"password\": \"SecurePassword123!\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Refresh Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "url": { "raw": "{{base_url}}/auth/refresh/", "host": ["{{base_url}}"], "path": ["auth", "refresh", ""] },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/auth/logout/", "host": ["{{base_url}}"], "path": ["auth", "logout", ""] },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Researcher Profiles",
+            "item": [{
+                    "name": "List All Researchers",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{base_url}}/api/researchers/?page=1", "host": ["{{base_url}}"], "path": ["api", "researchers"], "query": [{ "key": "page", "value": "1" }] }
+                    }
+                },
+                {
+                    "name": "Get My Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/researchers/my-profile/", "host": ["{{base_url}}"], "path": ["api", "researchers", "my-profile", ""] }
+                    }
+                },
+                {
+                    "name": "Get Researcher Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{base_url}}/api/researchers/{id}/", "host": ["{{base_url}}"], "path": ["api", "researchers", "{id}", ""] }
+                    }
+                },
+                {
+                    "name": "Update My Profile",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/researchers/{id}/", "host": ["{{base_url}}"], "path": ["api", "researchers", "{id}", ""] },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"bio\": \"Distinguished researcher in quantum computing\",\n  \"institution\": \"MIT\",\n  \"department\": \"Electrical Engineering\",\n  \"position\": \"Associate Professor\",\n  \"orcid_id\": \"0000-0002-1234-5678\",\n  \"google_scholar\": \"https://scholar.google.com/citations?user=...\",\n  \"research_interests\": \"Quantum Computing, Machine Learning, Cryptography\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get Researcher Papers",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{base_url}}/api/researchers/{id}/papers/", "host": ["{{base_url}}"], "path": ["api", "researchers", "{id}", "papers", ""] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Research Papers",
+            "item": [{
+                    "name": "List Papers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/papers/?visibility=public&status=published&page=1", "host": ["{{base_url}}"], "path": ["api", "papers"], "query": [{ "key": "visibility", "value": "public" }, { "key": "status", "value": "published" }, { "key": "page", "value": "1" }] }
+                    }
+                },
+                {
+                    "name": "Search Papers",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{base_url}}/api/papers/?search=quantum computing", "host": ["{{base_url}}"], "path": ["api", "papers"], "query": [{ "key": "search", "value": "quantum computing" }] }
+                    }
+                },
+                {
+                    "name": "Create Paper",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/papers/", "host": ["{{base_url}}"], "path": ["api", "papers", ""] },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Advanced Quantum Error Correction Algorithms\",\n  \"abstract\": \"This paper presents novel approaches to quantum error correction...\",\n  \"keywords\": \"quantum computing, error correction, algorithms\",\n  \"publication_date\": \"2024-06-01\",\n  \"doi\": \"10.1234/example.doi\",\n  \"visibility\": \"peer_review\",\n  \"status\": \"published\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get Paper Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/papers/{id}/", "host": ["{{base_url}}"], "path": ["api", "papers", "{id}", ""] }
+                    }
+                },
+                {
+                    "name": "Download Paper",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/papers/{id}/download/", "host": ["{{base_url}}"], "path": ["api", "papers", "{id}", "download", ""] }
+                    }
+                },
+                {
+                    "name": "Get Citation (BibTeX)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{base_url}}/api/papers/{id}/citations/?format=bibtex", "host": ["{{base_url}}"], "path": ["api", "papers", "{id}", "citations"], "query": [{ "key": "format", "value": "bibtex" }] }
+                    }
+                },
+                {
+                    "name": "Get Citation (APA)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{base_url}}/api/papers/{id}/citations/?format=apa", "host": ["{{base_url}}"], "path": ["api", "papers", "{id}", "citations"], "query": [{ "key": "format", "value": "apa" }] }
+                    }
+                },
+                {
+                    "name": "Update Paper",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/papers/{id}/", "host": ["{{base_url}}"], "path": ["api", "papers", "{id}", ""] },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Updated Title\",\n  \"visibility\": \"public\",\n  \"status\": \"published\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Paper",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/papers/{id}/", "host": ["{{base_url}}"], "path": ["api", "papers", "{id}", ""] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Datasets",
+            "item": [{
+                    "name": "List Datasets",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/datasets/?page=1", "host": ["{{base_url}}"], "path": ["api", "datasets"], "query": [{ "key": "page", "value": "1" }] }
+                    }
+                },
+                {
+                    "name": "Create Dataset",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/datasets/", "host": ["{{base_url}}"], "path": ["api", "datasets", ""] },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Quantum Measurement Data - Experiment Series A\",\n  \"description\": \"Raw measurement data from quantum computing experiments...\",\n  \"file_format\": \"CSV\",\n  \"file_size\": 1048576,\n  \"visibility\": \"peer_review\",\n  \"version\": \"1.0\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get Dataset",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/datasets/{id}/", "host": ["{{base_url}}"], "path": ["api", "datasets", "{id}", ""] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Access Permissions",
+            "item": [{
+                    "name": "List My Permissions",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/permissions/?page=1", "host": ["{{base_url}}"], "path": ["api", "permissions"], "query": [{ "key": "page", "value": "1" }] }
+                    }
+                },
+                {
+                    "name": "Grant Paper Access",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/permissions/", "host": ["{{base_url}}"], "path": ["api", "permissions", ""] },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"paper\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"reviewer\": \"reviewer_user_id\",\n  \"permission_type\": \"download\",\n  \"expires_at\": \"2024-12-31T23:59:59Z\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Revoke Permission",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                        ],
+                        "url": { "raw": "{{base_url}}/api/permissions/{id}/", "host": ["{{base_url}}"], "path": ["api", "permissions", "{id}", ""] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Audit & Logs",
+            "item": [{
+                "name": "Get Access Logs",
+                "request": {
+                    "method": "GET",
+                    "header": [
+                        { "key": "Authorization", "value": "Bearer {{access_token}}" }
+                    ],
+                    "url": { "raw": "{{base_url}}/api/audit-logs/?page=1", "host": ["{{base_url}}"], "path": ["api", "audit-logs"], "query": [{ "key": "page", "value": "1" }] }
+                }
+            }]
+        }
+    ],
+    "variable": [{
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        },
+        {
+            "key": "access_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "refresh_token",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

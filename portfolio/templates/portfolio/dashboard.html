@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load portfolio_tags %}
+
+{% block title %}Researcher Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Dashboard - {{ user.get_full_name }}</h1>
+            <p class="text-muted">Institution: {{ researcher.institution }}</p>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="{% url 'create_paper' %}" class="btn btn-primary">+ Upload Paper</a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="card-title">{{ papers.count }}</h3>
+                    <p class="card-text">Published Papers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="card-title">{{ datasets.count }}</h3>
+                    <p class="card-text">Datasets</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="card-title">{{ total_views }}</h3>
+                    <p class="card-text">Total Views</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="card-title">{{ total_downloads }}</h3>
+                    <p class="card-text">Total Downloads</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Papers -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h2>Recent Papers</h2>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Visibility</th>
+                            <th>Views</th>
+                            <th>Downloads</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for paper in papers %}
+                        <tr>
+                            <td><a href="{% url 'paper_detail' paper.id %}">{{ paper.title }}</a></td>
+                            <td><span class="badge badge-info">{{ paper.get_status_display }}</span></td>
+                            <td><span class="badge badge-secondary">{{ paper.get_visibility_display }}</span></td>
+                            <td>{{ paper.view_count }}</td>
+                            <td>{{ paper.download_count }}</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a href="#" class="btn btn-sm btn-outline-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No papers uploaded yet</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Access -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h2>Recent Access Activity</h2>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Paper</th>
+                            <th>Action</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in recent_access %}
+                        <tr>
+                            <td>{{ log.user.username }}</td>
+                            <td>{{ log.paper.title }}</td>
+                            <td><span class="badge badge-primary">{{ log.get_access_type_display }}</span></td>
+                            <td>{{ log.accessed_at|date:"M d, H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No recent activity</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

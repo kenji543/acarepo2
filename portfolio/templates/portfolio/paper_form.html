@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Research Paper{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Upload Research Paper</h1>
+            
+            <form method="post" enctype="multipart/form-data" class="mt-4">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                    <div class="alert alert-danger">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.abstract }}
+                    {% if form.abstract.errors %}
+                    <div class="alert alert-danger">{{ form.abstract.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.keywords }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.doi }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.publication_date }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.status }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.pdf_file.id_for_label }}">PDF File (Required)</label>
+                    {{ form.pdf_file }}
+                    <small class="form-text text-muted">Maximum file size: 100 MB</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.supplementary_data.id_for_label }}">Supplementary Data (Optional)</label>
+                    {{ form.supplementary_data }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.raw_data_file.id_for_label }}">Raw Data File (Optional)</label>
+                    {{ form.raw_data_file }}
+                    <small class="form-text text-muted">Restricted access - only accessible to authorized reviewers</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.visibility.id_for_label }}">Visibility</label>
+                    {{ form.visibility }}
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg">Upload Paper</button>
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-lg">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

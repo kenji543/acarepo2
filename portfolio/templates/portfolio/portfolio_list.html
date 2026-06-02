@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Academic Portfolios{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Academic Research Portfolios</h1>
+    
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Search & Filter</h5>
+                    <form method="get" class="form">
+                        <div class="form-group">
+                            <input type="text" name="q" class="form-control" placeholder="Search papers..." value="{{ request.GET.q }}">
+                        </div>
+                        <div class="form-group">
+                            <select name="institution" class="form-control">
+                                <option value="">All Institutions</option>
+                                <option value="MIT" {% if request.GET.institution == "MIT" %}selected{% endif %}>MIT</option>
+                                <option value="Harvard" {% if request.GET.institution == "Harvard" %}selected{% endif %}>Harvard</option>
+                                <option value="Stanford" {% if request.GET.institution == "Stanford" %}selected{% endif %}>Stanford</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="row">
+                {% for paper in papers %}
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'paper_detail' paper.id %}">{{ paper.title }}</a>
+                            </h5>
+                            <p class="card-text">{{ paper.abstract|truncatewords:50 }}</p>
+                            <p class="text-muted">
+                                <strong>By:</strong> {{ paper.researcher.user.get_full_name }}
+                                {% for co_author in paper.co_authors.all|slice:":3" %}
+                                , {{ co_author.author_name }}
+                                {% endfor %}
+                            </p>
+                            <p class="text-muted">
+                                <strong>Institution:</strong> {{ paper.researcher.institution }}
+                            </p>
+                            <p>
+                                {% if paper.doi %}
+                                <a href="https://doi.org/{{ paper.doi }}" target="_blank">DOI: {{ paper.doi }}</a>
+                                {% endif %}
+                            </p>
+                            <div>
+                                <a href="{% url 'paper_detail' paper.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                {% if user.is_authenticated %}
+                                <a href="{% url 'download_paper' paper.id %}" class="btn btn-sm btn-primary">Download</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-md-12">
+                    <p class="alert alert-info">No papers found matching your criteria.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1">First</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
