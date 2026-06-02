@@ -5,7 +5,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView, DetailView
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django_ratelimit.decorators import ratelimit
 from .models import ResearchPaper, Dataset, ResearcherProfile, FileAccessLog
 from .forms import ResearchPaperForm
@@ -19,13 +19,21 @@ def researcher_dashboard(request):
     """Dashboard for researchers to manage their portfolio."""
     researcher_profile, _ = ResearcherProfile.objects.get_or_create(user=request.user)
     
+    papers_qs = researcher_profile.papers.all()
+    aggregates = papers_qs.aggregate(
+        total_views=Sum('view_count'),
+        total_downloads=Sum('download_count'),
+    )
+
     context = {
         'researcher': researcher_profile,
-        'papers': researcher_profile.papers.all(),
+        'papers': papers_qs,
         'datasets': researcher_profile.datasets.all(),
+        'total_views': aggregates['total_views'] or 0,
+        'total_downloads': aggregates['total_downloads'] or 0,
         'recent_access': FileAccessLog.objects.filter(
             paper__researcher=researcher_profile
-        ).select_related('user').order_by('-accessed_at')[:10],
+        ).select_related('user', 'paper').order_by('-accessed_at')[:10],
     }
     return render(request, 'portfolio/dashboard.html', context)
 
@@ -55,6 +63,11 @@ class PortfolioListView(ListView):
             queryset = queryset.filter(researcher__institution=institution)
         
         return queryset.select_related('researcher__user').prefetch_related('co_authors')
+
+    def get_template_names(self):
+        if self.request.headers.get('HX-Request'):
+            return ['portfolio/partials/paper_grid.html']
+        return [self.template_name]
 
 
 class PaperDetailView(DetailView):

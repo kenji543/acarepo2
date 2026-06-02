@@ -3,79 +3,69 @@
 {% block title %}Upload Research Paper{% endblock %}
 
 {% block content %}
-<div class="mx-auto max-w-4xl rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm shadow-slate-200/50">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <p class="text-sm uppercase tracking-[0.3em] text-slate-500">Contributor Workflow</p>
-            <h1 class="text-3xl font-semibold text-slate-900">Upload Research Paper</h1>
+<div class="mx-auto max-w-3xl">
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-100 bg-gradient-to-br from-slate-50 to-white px-6 py-8 sm:px-8">
+            <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600">Contributor workflow</p>
+                    <h1 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Upload Research Paper</h1>
+                    <p class="mt-2 max-w-lg text-sm leading-relaxed text-slate-600">
+                        Add metadata and attach your manuscript. Fields marked with <span class="text-red-500">*</span> are required.
+                    </p>
+                </div>
+                <a href="{% url 'dashboard' %}" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition duration-200 hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <i data-lucide="arrow-left" class="h-4 w-4"></i>
+                    Back to Dashboard
+                </a>
+            </div>
         </div>
-        <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
-            <i data-lucide="chevron-left"></i> Back to Dashboard
-        </a>
+
+        <form method="post" enctype="multipart/form-data" class="px-6 py-8 sm:px-8">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <fieldset class="space-y-8">
+                <legend class="sr-only">Paper metadata and files</legend>
+
+                <section>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Paper details</h2>
+                    <div class="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+                        {% include "portfolio/includes/form_field.html" with field=form.title full_width=True %}
+                        {% include "portfolio/includes/form_field.html" with field=form.abstract full_width=True %}
+                        {% include "portfolio/includes/form_field.html" with field=form.keywords %}
+                        {% include "portfolio/includes/form_field.html" with field=form.doi %}
+                        {% include "portfolio/includes/form_field.html" with field=form.publication_date %}
+                        {% include "portfolio/includes/form_field.html" with field=form.status %}
+                        {% include "portfolio/includes/form_field.html" with field=form.visibility full_width=True %}
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Attachments</h2>
+                    <div class="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+                        {% include "portfolio/includes/file_upload_zone.html" with field=form.pdf_file icon="file-text" title="Drop your PDF here" hint="PDF format · max 100 MB" filename_id="pdf-filename" full_width=True %}
+                        {% include "portfolio/includes/file_upload_zone.html" with field=form.supplementary_data icon="paperclip" title="Supplementary materials" hint="Figures, appendices, or supporting files" filename_id="supplementary-filename" %}
+                        {% include "portfolio/includes/file_upload_zone.html" with field=form.raw_data_file icon="database" title="Raw data" hint="Restricted — authorized reviewers only" filename_id="rawdata-filename" %}
+                    </div>
+                </section>
+            </fieldset>
+
+            <div class="mt-10 flex flex-col-reverse gap-3 border-t border-slate-100 pt-8 sm:flex-row sm:justify-end">
+                <a href="{% url 'dashboard' %}" class="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition duration-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2">
+                    Cancel
+                </a>
+                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition duration-200 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <i data-lucide="upload" class="h-4 w-4"></i>
+                    Upload Paper
+                </button>
+            </div>
+        </form>
     </div>
-
-    <form method="post" enctype="multipart/form-data" class="mt-8 space-y-6">
-        {% csrf_token %}
-
-        <div class="grid gap-6">
-            <div class="space-y-2">
-                {{ form.title.label_tag }}
-                {{ form.title }}
-                {% if form.title.errors %}
-                <p class="text-sm text-red-600">{{ form.title.errors }}</p>
-                {% endif %}
-            </div>
-            <div class="space-y-2">
-                {{ form.abstract.label_tag }}
-                {{ form.abstract }}
-                {% if form.abstract.errors %}
-                <p class="text-sm text-red-600">{{ form.abstract.errors }}</p>
-                {% endif %}
-            </div>
-            <div class="grid gap-6 sm:grid-cols-2">
-                <div class="space-y-2">
-                    {{ form.keywords.label_tag }}
-                    {{ form.keywords }}
-                </div>
-                <div class="space-y-2">
-                    {{ form.doi.label_tag }}
-                    {{ form.doi }}
-                </div>
-            </div>
-            <div class="grid gap-6 sm:grid-cols-2">
-                <div class="space-y-2">
-                    {{ form.publication_date.label_tag }}
-                    {{ form.publication_date }}
-                </div>
-                <div class="space-y-2">
-                    {{ form.status.label_tag }}
-                    {{ form.status }}
-                </div>
-            </div>
-            <div class="space-y-2">
-                {{ form.pdf_file.label_tag }}
-                {{ form.pdf_file }}
-                <p class="text-sm text-slate-500">Maximum file size: 100 MB</p>
-            </div>
-            <div class="space-y-2">
-                {{ form.supplementary_data.label_tag }}
-                {{ form.supplementary_data }}
-            </div>
-            <div class="space-y-2">
-                {{ form.raw_data_file.label_tag }}
-                {{ form.raw_data_file }}
-                <p class="text-sm text-slate-500">Restricted access — only authorized reviewers can access raw data.</p>
-            </div>
-            <div class="space-y-2">
-                {{ form.visibility.label_tag }}
-                {{ form.visibility }}
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <a href="{% url 'dashboard' %}" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</a>
-            <button type="submit" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800">Upload Paper</button>
-        </div>
-    </form>
 </div>
 {% endblock %}

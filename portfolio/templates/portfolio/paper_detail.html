@@ -3,98 +3,146 @@
 {% block title %}{{ paper.title }}{% endblock %}
 
 {% block content %}
-<div class="mx-auto max-w-7xl space-y-8">
-    <section class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm shadow-slate-200/50">
-        <div class="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-            <div class="max-w-3xl">
-                <p class="text-sm uppercase tracking-[0.3em] text-slate-500">Research Paper</p>
-                <h1 class="mt-4 text-4xl font-semibold text-slate-900">{{ paper.title }}</h1>
-                <div class="mt-4 flex flex-wrap gap-3 text-sm text-slate-600">
-                    <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2">{{ paper.researcher.user.get_full_name }}</span>
-                    <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2">{{ paper.researcher.institution }}</span>
-                    <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2">Published: {{ paper.publication_date|date:"M d, Y" }}</span>
-                </div>
-            </div>
-            <div class="flex flex-col gap-3 sm:flex-row">
-                {% if user.is_authenticated %}
-                <a href="{% url 'download_paper' paper.id %}" class="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-slate-800">
-                    <i data-lucide="download"></i> Download PDF
-                </a>
-                {% else %}
-                <a href="{% url 'login' %}" class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50">
-                    <i data-lucide="log-in"></i> Login to Download
-                </a>
-                {% endif %}
-            </div>
+<div class="space-y-6">
+  <nav class="text-sm text-slate-500" aria-label="Breadcrumb">
+    <a href="{% url 'portfolio_list' %}" class="font-medium transition duration-200 hover:text-indigo-600">Browse papers</a>
+    <span class="mx-2 text-slate-300">/</span>
+    <span class="text-slate-700 line-clamp-1">{{ paper.title|truncatechars:60 }}</span>
+  </nav>
+
+  <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+      <div class="max-w-3xl">
+        <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600">Research paper</p>
+        <h1 class="mt-2 text-2xl font-semibold leading-tight text-slate-900 sm:text-4xl">{{ paper.title }}</h1>
+        <div class="mt-5 flex flex-wrap gap-2">
+          <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-sm text-slate-700">
+            <i data-lucide="user" class="h-3.5 w-3.5 text-slate-500"></i>
+            {{ paper.researcher.user.get_full_name|default:paper.researcher.user.username }}
+          </span>
+          {% if paper.researcher.institution %}
+          <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-sm text-slate-700">
+            <i data-lucide="building-2" class="h-3.5 w-3.5 text-slate-500"></i>
+            {{ paper.researcher.institution }}
+          </span>
+          {% endif %}
+          {% if paper.publication_date %}
+          <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-sm text-slate-700">
+            <i data-lucide="calendar" class="h-3.5 w-3.5 text-slate-500"></i>
+            {{ paper.publication_date|date:"F j, Y" }}
+          </span>
+          {% endif %}
         </div>
-    </section>
+      </div>
+      <div class="flex shrink-0 flex-col gap-2 sm:flex-row">
+        {% if user.is_authenticated %}
+        <a href="{% url 'download_paper' paper.id %}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition duration-200 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+          <i data-lucide="download" class="h-4 w-4"></i>
+          Download PDF
+        </a>
+        {% else %}
+        <a href="{% url 'login' %}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition duration-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+          <i data-lucide="log-in" class="h-4 w-4"></i>
+          Login to download
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
 
-    <section class="grid gap-8 xl:grid-cols-[1.7fr_0.9fr]">
-        <article class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm shadow-slate-200/50">
-            <div class="space-y-6">
-                <div>
-                    <h2 class="text-2xl font-semibold text-slate-900">Abstract</h2>
-                    <p class="mt-4 text-slate-600 leading-8">{{ paper.abstract }}</p>
-                </div>
+  <section class="grid gap-6 lg:grid-cols-3">
+    <article class="space-y-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 lg:col-span-2">
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">Abstract</h2>
+        <p class="mt-3 text-sm leading-7 text-slate-600">{{ paper.abstract }}</p>
+      </div>
 
-                {% if paper.keywords %}
-                <div>
-                    <h3 class="text-lg font-semibold text-slate-900">Keywords</h3>
-                    <p class="mt-3 flex flex-wrap gap-2 text-sm text-slate-700">
-                        <span class="rounded-full bg-slate-100 px-3 py-1">{{ paper.keywords }}</span>
-                    </p>
-                </div>
-                {% endif %}
+      {% if paper.keywords %}
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">Keywords</h2>
+        <div class="mt-3 flex flex-wrap gap-2">
+          {% for keyword in paper.keywords.split:"," %}
+          <span class="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">{{ keyword }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
 
-                {% if paper.doi %}
-                <div class="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
-                    <h3 class="text-lg font-semibold text-slate-900">Citation</h3>
-                    <p class="mt-3 text-sm text-slate-600">DOI: <a href="https://doi.org/{{ paper.doi }}" target="_blank" class="font-medium text-slate-900 hover:text-slate-700">{{ paper.doi }}</a></p>
-                </div>
-                {% endif %}
+      {% if paper.doi %}
+      <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
+        <h2 class="text-sm font-semibold text-slate-900">Citation</h2>
+        <p class="mt-2 text-sm text-slate-600">
+          DOI:
+          <a href="https://doi.org/{{ paper.doi }}" target="_blank" rel="noopener noreferrer" class="font-medium text-indigo-600 transition duration-200 hover:text-indigo-700">
+            {{ paper.doi }}
+          </a>
+        </p>
+      </div>
+      {% endif %}
 
-                <div class="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
-                    <h3 class="text-lg font-semibold text-slate-900">Author Team</h3>
-                    <ul class="mt-4 space-y-3 text-sm text-slate-700">
-                        <li>{{ paper.researcher.user.get_full_name }} — {{ paper.researcher.institution }}</li>
-                        {% for co_author in paper.co_authors.all %}
-                        <li>{{ co_author.author_name }} — {{ co_author.author_institution }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+      <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
+        <h2 class="text-sm font-semibold text-slate-900">Author team</h2>
+        <ul class="mt-4 space-y-3 text-sm text-slate-600">
+          <li class="flex items-start gap-3">
+            <span class="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700">1</span>
+            <div>
+              <p class="font-medium text-slate-900">{{ paper.researcher.user.get_full_name|default:paper.researcher.user.username }}</p>
+              <p class="text-slate-500">{{ paper.researcher.institution }}</p>
             </div>
-        </article>
+          </li>
+          {% for co_author in paper.co_authors.all %}
+          <li class="flex items-start gap-3">
+            <span class="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700">{{ forloop.counter|add:1 }}</span>
+            <div>
+              <p class="font-medium text-slate-900">{{ co_author.author_name }}</p>
+              <p class="text-slate-500">{{ co_author.author_institution }}</p>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </article>
 
-        <aside class="space-y-6">
-            <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/50">
-                <h3 class="text-lg font-semibold text-slate-900">About the Researcher</h3>
-                <p class="mt-4 text-sm leading-7 text-slate-600">{{ paper.researcher.bio }}</p>
-                {% if paper.researcher.orcid_id %}
-                <p class="mt-4 text-sm text-slate-600">ORCID: <a href="https://orcid.org/{{ paper.researcher.orcid_id }}" target="_blank" class="font-medium text-slate-900 hover:text-slate-700">{{ paper.researcher.orcid_id }}</a></p>
-                {% endif %}
-            </div>
-            <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/50">
-                <h3 class="text-lg font-semibold text-slate-900">Paper Details</h3>
-                <dl class="mt-4 space-y-4 text-sm text-slate-600">
-                    <div class="flex items-center justify-between gap-3">
-                        <dt class="font-medium text-slate-700">Status</dt>
-                        <dd class="rounded-full bg-slate-100 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-600">{{ paper.get_status_display }}</dd>
-                    </div>
-                    <div class="flex items-center justify-between gap-3">
-                        <dt class="font-medium text-slate-700">Visibility</dt>
-                        <dd class="rounded-full bg-slate-100 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-600">{{ paper.get_visibility_display }}</dd>
-                    </div>
-                    <div class="flex items-center justify-between gap-3">
-                        <dt class="font-medium text-slate-700">Views</dt>
-                        <dd>{{ paper.view_count }}</dd>
-                    </div>
-                    <div class="flex items-center justify-between gap-3">
-                        <dt class="font-medium text-slate-700">Downloads</dt>
-                        <dd>{{ paper.download_count }}</dd>
-                    </div>
-                </dl>
-            </div>
-        </aside>
-    </section>
+    <aside class="space-y-6">
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Researcher</h3>
+        {% if paper.researcher.bio %}
+        <p class="mt-3 text-sm leading-relaxed text-slate-600">{{ paper.researcher.bio }}</p>
+        {% else %}
+        <p class="mt-3 text-sm text-slate-500">No biography provided.</p>
+        {% endif %}
+        {% if paper.researcher.orcid_id %}
+        <p class="mt-4 text-sm text-slate-600">
+          ORCID:
+          <a href="https://orcid.org/{{ paper.researcher.orcid_id }}" target="_blank" rel="noopener noreferrer" class="font-medium text-indigo-600 hover:text-indigo-700">
+            {{ paper.researcher.orcid_id }}
+          </a>
+        </p>
+        {% endif %}
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Paper details</h3>
+        <dl class="mt-4 space-y-4 text-sm">
+          <div class="flex items-center justify-between gap-3">
+            <dt class="text-slate-600">Status</dt>
+            <dd><span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">{{ paper.get_status_display }}</span></dd>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <dt class="text-slate-600">Visibility</dt>
+            <dd><span class="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">{{ paper.get_visibility_display }}</span></dd>
+          </div>
+          <div class="flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
+            <dt class="text-slate-600">Views</dt>
+            <dd class="font-semibold tabular-nums text-slate-900">{{ paper.view_count }}</dd>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <dt class="text-slate-600">Downloads</dt>
+            <dd class="font-semibold tabular-nums text-slate-900">{{ paper.download_count }}</dd>
+          </div>
+        </dl>
+      </div>
+    </aside>
+  </section>
 </div>
 {% endblock %}
