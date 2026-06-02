@@ -90,14 +90,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'academic_portfolio.wsgi.application'
 
-# Database configuration - Supabase/PostgreSQL
-DATABASES = {
-    'default': dj_database_url.config(
-        default=env('DATABASE_URL', default='postgresql://user:password@localhost:5432/academic_portfolio'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+# ===== DATABASE CONFIGURATION =====
+# Railway automatically injects DATABASE_URL
+# dj_database_url parses it and creates the connection dict
+if os.environ.get('DATABASE_URL'):
+    # Production: Use environment DATABASE_URL (Railway, Supabase, etc)
+    DATABASES = {
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            conn_health_checks=True,
+            atomic=True,
+        )
+    }
+else:
+    # Development: Fallback to SQLite locally
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
