@@ -2,4 +2,5 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "gunicorn academic_portfolio.wsgi:application --bind 0.0.0.0:8000"
+startCommand = "[deploy]
+startCommand = "python manage.py migrate && python manage.py createsuperuser --noinput; gunicorn academic_portfolio.wsgi:application --bind 0.0.0.0:8000""
