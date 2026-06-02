@@ -3,8 +3,9 @@ Django settings for academic_portfolio project.
 """
 
 import os
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
+from urllib.parse import urlparse
 
 import dj_database_url
 import environ
@@ -35,10 +36,50 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-dev-key-change-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG', default=False)
 
-# Allow all Vercel domains and include specific domain if provided
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.up.railway.app']
-if 'RAILWAY_PUBLIC_DOMAIN' in os.environ:
-    ALLOWED_HOSTS.append(os.environ['RAILWAY_PUBLIC_DOMAIN'])
+# ===== ALLOWED HOSTS (Railway + local development) =====
+def _hosts_from_env(*var_names: str) -> list[str]:
+    """Parse comma-separated host lists from environment variables."""
+    hosts: list[str] = []
+    for name in var_names:
+        raw = os.environ.get(name, "")
+        if raw:
+            hosts.extend(h.strip() for h in raw.split(",") if h.strip())
+    return hosts
+
+
+_DEFAULT_ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "acarepo2-production.up.railway.app",
+    ".up.railway.app",  # Railway *.up.railway.app services
+    ".railway.app",  # Railway-generated subdomains
+]
+
+ALLOWED_HOSTS = list(_DEFAULT_ALLOWED_HOSTS)
+ALLOWED_HOSTS.extend(_hosts_from_env("DJANGO_ALLOWED_HOSTS", "ALLOWED_HOSTS"))
+
+# Railway injects the public service hostname at runtime
+_railway_public = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "").strip()
+if _railway_public:
+    if "://" in _railway_public:
+        _railway_public = urlparse(_railway_public).hostname or _railway_public
+    ALLOWED_HOSTS.append(_railway_public)
+
+# Deduplicate while preserving order
+ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
+
+# HTTPS form posts (login, logout, uploads) from production domains
+CSRF_TRUSTED_ORIGINS = []
+for _host in ALLOWED_HOSTS:
+    if _host.startswith("."):
+        continue
+    if _host in ("localhost", "127.0.0.1"):
+        CSRF_TRUSTED_ORIGINS.extend(
+            (f"http://{_host}", f"https://{_host}")
+        )
+    else:
+        CSRF_TRUSTED_ORIGINS.append(f"https://{_host}")
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(CSRF_TRUSTED_ORIGINS))
 
 # Application definition
 INSTALLED_APPS = [
@@ -146,6 +187,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Session authentication (template frontend)
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/auth/login/'
 
 # ===== CLOUDINARY CONFIGURATION =====
 # Credentials are read only from the process environment (see cloudinary_settings.py).

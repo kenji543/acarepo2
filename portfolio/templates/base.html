@@ -54,12 +54,12 @@
                 {% if user.is_authenticated %}
                 <a href="{% url 'dashboard' %}" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition duration-200 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">Dashboard</a>
                 <a href="/admin/" class="rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition duration-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300">Admin</a>
-                <form method="post" action="{% url 'logout' %}" class="ml-1 inline">
+                <form method="post" action="{% url 'auth_service:logout' %}" class="ml-1 inline">
                     {% csrf_token %}
                     <button type="submit" class="rounded-lg bg-slate-900 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition duration-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2">Logout</button>
                 </form>
                 {% else %}
-                <a href="{% url 'login' %}" class="rounded-lg bg-indigo-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition duration-200 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Login</a>
+                <a href="{% url 'auth_service:login' %}" class="rounded-lg bg-indigo-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition duration-200 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Login</a>
                 {% endif %}
             </nav>
 
@@ -72,12 +72,12 @@
                     {% if user.is_authenticated %}
                     <a href="{% url 'dashboard' %}" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Dashboard</a>
                     <a href="/admin/" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Admin</a>
-                    <form method="post" action="{% url 'logout' %}" class="mt-1 border-t border-slate-100 pt-1">
+                    <form method="post" action="{% url 'auth_service:logout' %}" class="mt-1 border-t border-slate-100 pt-1">
                         {% csrf_token %}
                         <button type="submit" class="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">Logout</button>
                     </form>
                     {% else %}
-                    <a href="{% url 'login' %}" class="block rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50">Login</a>
+                    <a href="{% url 'auth_service:login' %}" class="block rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50">Login</a>
                     {% endif %}
                 </div>
             </details>

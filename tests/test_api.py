@@ -25,7 +25,7 @@ class APIAuthenticationTest(APITestCase):
     
     def test_user_registration(self):
         """Test user registration."""
-        response = self.client.post('/auth/register/', self.user_data)
+        response = self.client.post('/auth/api/register/', self.user_data)
         self.assertEqual(response.status_code, 201)
         self.assertTrue(User.objects.filter(username='testuser').exists())
     
@@ -39,7 +39,7 @@ class APIAuthenticationTest(APITestCase):
         )
         
         # Login
-        response = self.client.post('/auth/login/', {
+        response = self.client.post('/auth/api/login/', {
             'username': 'testuser',
             'password': 'TestPassword123!'
         })
@@ -50,7 +50,7 @@ class APIAuthenticationTest(APITestCase):
     
     def test_invalid_credentials(self):
         """Test login with invalid credentials."""
-        response = self.client.post('/auth/login/', {
+        response = self.client.post('/auth/api/login/', {
             'username': 'nonexistent',
             'password': 'wrongpassword'
         })
