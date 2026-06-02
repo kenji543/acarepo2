@@ -3,7 +3,7 @@ djangorestframework==3.14.0
 django-cors-headers==4.3.1
 django-environ==0.11.2
 djangorestframework-simplejwt==5.3.1
-psycopg[binary]==3.1.18
+psycopg[binary]>=3.2.0
 dj-database-url==2.1.0
 cloudinary==1.36.0
 django-cloudinary-storage==0.3.0
