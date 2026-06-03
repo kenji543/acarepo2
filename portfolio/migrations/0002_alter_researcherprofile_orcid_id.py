@@ -1,12 +1,6 @@
 from django.db import migrations, models
 
 
-def empty_orcid_to_null(apps, schema_editor):
-    """Postgres unique constraint treats '' as a value; normalize to NULL."""
-    ResearcherProfile = apps.get_model("portfolio", "ResearcherProfile")
-    ResearcherProfile.objects.filter(orcid_id="").update(orcid_id=None)
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -14,7 +8,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(empty_orcid_to_null, migrations.RunPython.noop),
         migrations.AlterField(
             model_name="researcherprofile",
             name="orcid_id",
