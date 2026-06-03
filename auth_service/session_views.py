@@ -73,7 +73,7 @@ def session_register(request):
                     user=user,
                     defaults={"orcid_id": None},
                 )
-                login(request, user)
+                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 ip = _client_ip(request)
                 AuditLog.objects.create(
                     user=user,
