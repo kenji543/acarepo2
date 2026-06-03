@@ -31,6 +31,7 @@ def researcher_dashboard(request):
     )
 
     context = {
+        'user': request.user,  # <-- ADD THIS LINE
         'researcher': researcher_profile,
         'papers': papers_qs,
         'datasets': researcher_profile.datasets.all(),
@@ -40,6 +41,7 @@ def researcher_dashboard(request):
             paper__researcher=researcher_profile
         ).select_related('user', 'paper').order_by('-accessed_at')[:10],
     }
+    
     return render(request, 'portfolio/dashboard.html', context)
 
 
