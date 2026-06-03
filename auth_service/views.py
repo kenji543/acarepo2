@@ -27,7 +27,10 @@ class RegisterView(viewsets.ViewSet):
             user = serializer.save()
             
             # Create researcher profile
-            ResearcherProfile.objects.create(user=user)
+            ResearcherProfile.objects.get_or_create(
+                user=user,
+                defaults={"orcid_id": None},
+            )
             
             # Log registration
             ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))

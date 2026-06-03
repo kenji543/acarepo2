@@ -19,7 +19,10 @@ logger = logging.getLogger('django.security')
 @login_required
 def researcher_dashboard(request):
     """Dashboard for researchers to manage their portfolio."""
-    researcher_profile, _ = ResearcherProfile.objects.get_or_create(user=request.user)
+    researcher_profile, _ = ResearcherProfile.objects.get_or_create(
+        user=request.user,
+        defaults={"orcid_id": None},
+    )
     
     papers_qs = researcher_profile.papers.all()
     aggregates = papers_qs.aggregate(

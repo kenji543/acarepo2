@@ -18,7 +18,14 @@ class ResearcherProfile(models.Model):
     institution = models.CharField(max_length=255, blank=True, help_text="University/Research Institution")
     department = models.CharField(max_length=255, blank=True)
     position = models.CharField(max_length=100, blank=True, help_text="Job title/Position")
-    orcid_id = models.CharField(max_length=50, blank=True, unique=True, help_text="ORCID identifier")
+    orcid_id = models.CharField(
+        max_length=50,
+        unique=True,
+        null=True,
+        blank=True,
+        default=None,
+        help_text="ORCID identifier",
+    )
     google_scholar = models.URLField(blank=True, validators=[URLValidator()])
     research_interests = models.TextField(blank=True, help_text="Comma-separated research areas")
     

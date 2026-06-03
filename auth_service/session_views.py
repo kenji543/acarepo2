@@ -9,6 +9,7 @@ import logging
 from django.contrib import messages
 from django.contrib.auth import login, logout as django_logout
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError, transaction
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods, require_POST
@@ -65,17 +66,30 @@ def session_register(request):
 
     form = SessionRegistrationForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        user = form.save()
-        ResearcherProfile.objects.get_or_create(user=user)
-        login(request, user)
-        ip = _client_ip(request)
-        AuditLog.objects.create(
-            user=user,
-            event_type="registration",
-            description=f"Session registration from {ip}",
-            ip_address=ip,
-            user_agent=_user_agent(request),
-        )
+        try:
+            with transaction.atomic():
+                user = form.save()
+                ResearcherProfile.objects.get_or_create(
+                    user=user,
+                    defaults={"orcid_id": None},
+                )
+                login(request, user)
+                ip = _client_ip(request)
+                AuditLog.objects.create(
+                    user=user,
+                    event_type="registration",
+                    description=f"Session registration for {user.username} from {ip}",
+                    ip_address=ip,
+                    user_agent=_user_agent(request),
+                )
+        except IntegrityError:
+            logger.exception("Registration failed due to database integrity error")
+            messages.error(
+                request,
+                "We could not complete registration. If you already have an account, try signing in.",
+            )
+            return render(request, "auth/register.html", {"form": form})
+
         messages.success(request, "Your account was created successfully.")
         return redirect("dashboard")
 

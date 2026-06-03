@@ -27,6 +27,7 @@ class AuditLog(models.Model):
     EVENT_TYPES = (
         ('login', 'Login'),
         ('logout', 'Logout'),
+        ('registration', 'Registration'),
         ('token_refresh', 'Token Refresh'),
         ('failed_login', 'Failed Login'),
         ('permission_change', 'Permission Change'),
