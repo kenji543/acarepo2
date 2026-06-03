@@ -186,6 +186,34 @@ class ResearchPaper(models.Model):
             'mla': self.generate_mla_citation(),
             'bibtex': self.generate_bibtex_citation(),
         }
+    
+    @property
+    def thumbnail_url(self):
+        """Generate Cloudinary thumbnail URL for PDF preview.
+        
+        Converts PDF to JPG thumbnail using Cloudinary's transformation API.
+        Example: pdf_file URL becomes thumbnail with page 1, scaled to 120x160px.
+        """
+        if not self.pdf_file:
+            return None
+        
+        try:
+            pdf_url = str(self.pdf_file.url)
+            # Cloudinary URL format: https://res.cloudinary.com/{cloud_name}/{resource_type}/upload/{public_id}
+            # Transform to: https://res.cloudinary.com/{cloud_name}/{resource_type}/upload/c_pad,w_120,h_160,pg_1/f_jpg/{public_id}
+            
+            # Split URL to inject transformation parameters
+            if 'upload/' in pdf_url:
+                # Insert transformation parameters before the public_id
+                parts = pdf_url.split('upload/')
+                transformation = 'c_pad,w_120,h_160,pg_1/f_jpg/'
+                thumbnail = parts[0] + 'upload/' + transformation + parts[1]
+                return thumbnail
+        except Exception as e:
+            import logging
+            logging.error(f"Error generating thumbnail URL for paper {self.id}: {e}")
+        
+        return None
 
 
 class CoAuthor(models.Model):

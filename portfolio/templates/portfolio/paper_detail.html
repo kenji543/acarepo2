@@ -100,6 +100,32 @@
     </article>
 
     <aside class="space-y-6">
+      <!-- PDF Thumbnail -->
+      {% if paper.thumbnail_url %}
+      <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Document Preview</h3>
+        <img src="{{ paper.thumbnail_url }}" alt="PDF Preview" class="w-full rounded-lg border border-slate-200 shadow-sm" />
+      </div>
+      {% endif %}
+
+      <!-- Action Buttons -->
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-3">
+        <button 
+          onclick="openCitationModal('{{ paper.id }}', '{{ paper.title|escapejs }}')" 
+          class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-100 px-4 py-2.5 text-sm font-medium text-indigo-700 transition duration-200 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+          <i data-lucide="quote" class="h-4 w-4"></i>
+          Cite This Paper
+        </button>
+        {% if user == paper.researcher.user %}
+        <a 
+          href="{% url 'edit_paper' paper.id %}" 
+          class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition duration-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300">
+          <i data-lucide="edit-2" class="h-4 w-4"></i>
+          Edit Paper
+        </a>
+        {% endif %}
+      </div>
+
       <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Researcher</h3>
         {% if paper.researcher.bio %}
@@ -141,4 +167,124 @@
     </aside>
   </section>
 </div>
+
+<!-- Citation Modal -->
+<div id="citationModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+    <div class="w-full max-w-xl rounded-2xl border border-slate-200 bg-white shadow-lg">
+        <div class="border-b border-slate-100 px-6 py-5">
+            <h2 class="text-xl font-semibold text-slate-900">Cite This Paper</h2>
+            <p id="citePaperTitle" class="mt-1 text-sm text-slate-600"></p>
+        </div>
+        <div id="citationContent" class="space-y-6 p-6">
+            <!-- Citations will be loaded here -->
+            <div class="flex items-center justify-center py-8">
+                <p class="text-slate-500">Loading citations...</p>
+            </div>
+        </div>
+        <div class="border-t border-slate-100 px-6 py-4">
+            <button 
+                onclick="closeCitationModal()" 
+                class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition duration-200 hover:bg-slate-50">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Citation Modal Functions
+function openCitationModal(paperId, paperTitle) {
+    document.getElementById('citePaperTitle').textContent = paperTitle;
+    document.getElementById('citationModal').classList.remove('hidden');
+    loadCitations(paperId);
+}
+
+function closeCitationModal() {
+    document.getElementById('citationModal').classList.add('hidden');
+}
+
+function loadCitations(paperId) {
+    const contentDiv = document.getElementById('citationContent');
+    contentDiv.innerHTML = '<div class="flex items-center justify-center py-8"><p class="text-slate-500">Loading citations...</p></div>';
+    
+    fetch(`/paper/${paperId}/citations/`)
+        .then(response => response.json())
+        .then(data => {
+            const citations = data.citations;
+            let html = '';
+            
+            // APA Citation
+            html += `
+                <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                    <div class="mb-3 flex items-center justify-between">
+                        <h3 class="font-semibold text-slate-900">APA</h3>
+                        <button onclick="copyCitation('${citations.apa}')" class="inline-flex items-center gap-1 rounded-md bg-indigo-100 px-2.5 py-1.5 text-xs font-medium text-indigo-700 transition duration-200 hover:bg-indigo-200">
+                            <i data-lucide="copy" class="h-3.5 w-3.5"></i>
+                            Copy
+                        </button>
+                    </div>
+                    <p class="text-sm text-slate-700">${escapeHtml(citations.apa)}</p>
+                </div>
+            `;
+            
+            // MLA Citation
+            html += `
+                <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                    <div class="mb-3 flex items-center justify-between">
+                        <h3 class="font-semibold text-slate-900">MLA</h3>
+                        <button onclick="copyCitation('${citations.mla}')" class="inline-flex items-center gap-1 rounded-md bg-indigo-100 px-2.5 py-1.5 text-xs font-medium text-indigo-700 transition duration-200 hover:bg-indigo-200">
+                            <i data-lucide="copy" class="h-3.5 w-3.5"></i>
+                            Copy
+                        </button>
+                    </div>
+                    <p class="text-sm text-slate-700">${escapeHtml(citations.mla)}</p>
+                </div>
+            `;
+            
+            // BibTeX Citation
+            html += `
+                <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                    <div class="mb-3 flex items-center justify-between">
+                        <h3 class="font-semibold text-slate-900">BibTeX</h3>
+                        <button onclick="copyCitation(\`${citations.bibtex.replace(/`/g, '\\`')}\`)" class="inline-flex items-center gap-1 rounded-md bg-indigo-100 px-2.5 py-1.5 text-xs font-medium text-indigo-700 transition duration-200 hover:bg-indigo-200">
+                            <i data-lucide="copy" class="h-3.5 w-3.5"></i>
+                            Copy
+                        </button>
+                    </div>
+                    <pre class="overflow-x-auto rounded bg-white p-3 text-xs text-slate-700"><code>${escapeHtml(citations.bibtex)}</code></pre>
+                </div>
+            `;
+            
+            contentDiv.innerHTML = html;
+            lucide.createIcons();
+        })
+        .catch(error => {
+            contentDiv.innerHTML = '<p class="text-red-600">Error loading citations. Please try again.</p>';
+        });
+}
+
+function copyCitation(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Citation copied to clipboard!');
+    }).catch(() => {
+        alert('Failed to copy. Please try again.');
+    });
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+// Close modals when clicking outside
+document.getElementById('citationModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'citationModal') closeCitationModal();
+});
+</script>
 {% endblock %}
