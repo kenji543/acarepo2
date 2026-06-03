@@ -41,7 +41,7 @@ def researcher_dashboard(request):
             paper__researcher=researcher_profile
         ).select_related('user', 'paper').order_by('-accessed_at')[:10],
     }
-    
+
     return render(request, 'portfolio/dashboard.html', context)
 
 
@@ -173,6 +173,48 @@ def create_paper(request):
         form = ResearchPaperForm()
     
     return render(request, 'portfolio/paper_form.html', {'form': form})
+
+
+@login_required
+def edit_paper(request, paper_id):
+    """Edit research paper metadata (Anti-IDOR protected)."""
+    paper = get_object_or_404(ResearchPaper, id=paper_id)
+    researcher = get_object_or_404(ResearcherProfile, user=request.user)
+    
+    # Anti-IDOR: Verify user owns this paper
+    if paper.researcher.user != request.user:
+        logger.warning(f"Unauthorized edit attempt by {request.user.username} for paper {paper_id}")
+        return JsonResponse({'error': 'Access denied'}, status=403)
+    
+    if request.method == 'POST':
+        form = ResearchPaperForm(request.POST, request.FILES, instance=paper)
+        if form.is_valid():
+            # Preserve the original file if no new one is uploaded
+            if 'pdf_file' not in request.FILES or not request.FILES.get('pdf_file'):
+                form.instance.pdf_file = paper.pdf_file
+            
+            paper = form.save()
+            messages.success(request, 'Paper updated successfully!')
+            return redirect('paper_detail', pk=paper.id)
+    else:
+        form = ResearchPaperForm(instance=paper)
+    
+    return render(request, 'portfolio/paper_form.html', {
+        'form': form,
+        'paper': paper,
+        'is_edit': True,
+    })
+
+
+@login_required
+def get_paper_citations(request, paper_id):
+    """API endpoint to retrieve formatted citations for a paper."""
+    paper = get_object_or_404(ResearchPaper, id=paper_id)
+    
+    return JsonResponse({
+        'title': paper.title,
+        'citations': paper.get_all_citations(),
+    })
 
 
 def get_client_ip(request):

@@ -121,6 +121,71 @@ class ResearchPaper(models.Model):
     
     def __str__(self):
         return f"{self.title} - {self.researcher.user.username}"
+    
+    def get_author_name(self):
+        """Get primary author name from researcher profile."""
+        return self.researcher.user.get_full_name() or self.researcher.user.username
+    
+    def get_publication_year(self):
+        """Get publication year from date."""
+        if self.publication_date:
+            return self.publication_date.year
+        return self.created_at.year
+    
+    def get_journal_info(self):
+        """Get journal/publisher info - can be extended with a model field."""
+        return "Academic Research Portfolio"
+    
+    def generate_apa_citation(self):
+        """Generate APA formatted citation."""
+        author = self.get_author_name()
+        year = self.get_publication_year()
+        title = self.title
+        journal = self.get_journal_info()
+        
+        citation = f"{author} ({year}). {title}. {journal}."
+        if self.doi:
+            citation += f" https://doi.org/{self.doi}"
+        return citation
+    
+    def generate_mla_citation(self):
+        """Generate MLA formatted citation."""
+        author = self.get_author_name()
+        title = self.title
+        journal = self.get_journal_info()
+        year = self.get_publication_year()
+        
+        citation = f"{author}. \"{title}.\" {journal}, {year}."
+        if self.doi:
+            citation += f" Web. https://doi.org/{self.doi}"
+        return citation
+    
+    def generate_bibtex_citation(self):
+        """Generate BibTeX formatted citation."""
+        author = self.get_author_name()
+        title = self.title
+        year = self.get_publication_year()
+        
+        # Use DOI as key if available, otherwise use author + year
+        key = self.doi.replace("/", "_") if self.doi else f"{author.split()[-1]}{year}"
+        
+        citation = f"@article{{{key},\n"
+        citation += f"  author = {{{author}}},\n"
+        citation += f"  title = {{{title}}},\n"
+        citation += f"  year = {{{year}}}"
+        if self.doi:
+            citation += f",\n  doi = {{{self.doi}}}"
+        citation += "\n}"
+        
+        return citation
+    
+    def get_all_citations(self):
+        """Return dictionary with all citation formats."""
+        return {
+            'apa': self.generate_apa_citation(),
+            'mla': self.generate_mla_citation(),
+            'bibtex': self.generate_bibtex_citation(),
+        }
 
 
 class CoAuthor(models.Model):

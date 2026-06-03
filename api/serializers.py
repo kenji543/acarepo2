@@ -39,6 +39,7 @@ class ResearchPaperSerializer(serializers.ModelSerializer):
     """Serializer for ResearchPaper with conditional field masking based on JWT tier."""
     researcher = ResearcherProfileSerializer(read_only=True)
     co_authors = CoAuthorSerializer(many=True, read_only=True)
+    citations = serializers.SerializerMethodField()
     
     class Meta:
         model = ResearchPaper
@@ -46,12 +47,16 @@ class ResearchPaperSerializer(serializers.ModelSerializer):
             'id', 'researcher', 'title', 'abstract', 'keywords',
             'publication_date', 'doi', 'status', 'visibility',
             'pdf_file', 'supplementary_data', 'raw_data_file',
-            'view_count', 'download_count', 'co_authors',
+            'view_count', 'download_count', 'co_authors', 'citations',
             'created_at', 'updated_at'
         ]
         read_only_fields = [
-            'id', 'view_count', 'download_count', 'created_at', 'updated_at'
+            'id', 'view_count', 'download_count', 'created_at', 'updated_at', 'citations'
         ]
+    
+    def get_citations(self, obj):
+        """Return formatted citations in multiple formats."""
+        return obj.get_all_citations()
     
     def to_representation(self, instance):
         """Override to apply JWT tier-based field masking."""

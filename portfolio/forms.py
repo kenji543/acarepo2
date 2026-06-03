@@ -17,17 +17,26 @@ class ResearchPaperForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         pdf_field = self.fields["pdf_file"]
-        pdf_field.required = True
+        
+        # For editing (instance exists), make PDF optional to preserve existing file
+        if self.instance and self.instance.pk:
+            pdf_field.required = False
+        else:
+            pdf_field.required = True
+        
         pdf_field.widget.attrs.update(
             {
                 "accept": "application/pdf",
-                "required": "required",
             }
         )
 
     def clean_pdf_file(self):
         uploaded = self.cleaned_data.get("pdf_file")
+        
+        # If no file uploaded, check if it's an edit (should have existing file)
         if not uploaded:
+            if self.instance and self.instance.pdf_file:
+                return self.instance.pdf_file
             raise forms.ValidationError("A PDF file is required.")
 
         if not uploaded.name.lower().endswith(".pdf"):
